@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/label
+    driver-class-name: org.postgresql.Driver
+    username: admin
+    password: root
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/label
+#    driver-class-name: org.postgresql.Driver
+#    username: alex
+#    password: eE2718281828*
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQL95Dialect
+        generate_statistics: false
+
+logging:
+  level:
+    web: debug

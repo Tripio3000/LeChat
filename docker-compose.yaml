@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  api:
+    build: ./api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - myrabbit
+      - db
+    networks:
+      - mynetwork
+
+  web:
+    build: ./react-web-client
+    ports:
+      - "3000:3000"
+    networks:
+      - mynetwork
+
+  keras-gen:
+    build: ./kerascode/keras-gen
+    ports:
+      - "5001:5001"
+    depends_on:
+      - myrabbit
+    links:
+      - myrabbit
+    networks:
+      - mynetwork
+
+  myrabbit:
+    hostname: myrabbit
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - mynetwork
+
+  db:
+    image: postgres:14.8-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: label
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
