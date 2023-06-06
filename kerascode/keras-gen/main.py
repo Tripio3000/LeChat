@@ -3,17 +3,12 @@ import multiprocessing
 import json
 import psycopg2
 import time
-from keras_cv.models import StableDiffusion
-from PIL import Image
+# from keras_cv.models import StableDiffusion
+# from PIL import Image
 
 from MessageDto import MessageDto
 
-# CONNECTION = 'dbname=label user=admin'
-# AMQP_SERVER_URL = 'rabbitmq://kerascode-myrabbit-1:5672'
-
-
 def update_db(id, status):
-    # conn = psycopg2.connect(CONNECTION)
     CONNECTION = psycopg2.connect(
         host="db",
         port="5432",
@@ -30,7 +25,6 @@ def update_db(id, status):
 
 
 def set_image_path(id, image_name):
-    # conn = psycopg2.connect(CONNECTION)
     CONNECTION = psycopg2.connect(
         host="db",
         port="5432",
@@ -45,17 +39,22 @@ def set_image_path(id, image_name):
     cursor.execute(sql_update_query, (id, image_name))
     CONNECTION.commit()
 
-
+#     Скрипт для генерации изобоажений лежит отдельно в этом же репозитории.
+#     Для демонстрации работы приложения вместо генерации используется sleep 15 секунд.
 def generate_image(dto):
-    model = StableDiffusion(img_height=512, img_width=512, jit_compile=True)
-    img = model.text_to_image(
-        prompt=dto.get_message(),
-        batch_size=dto.get_batch_size(),  # How many images to generate at once
-        num_steps=dto.get_num_steps(),  # Number of iterations (controls image quality)
-        seed=dto.get_seed(),  # Set this to always get the same image from the same prompt
-    )
+    # Используем модель для генерации изображения
+    # model = StableDiffusion(img_height=512, img_width=512, jit_compile=True)
+    # img = model.text_to_image(
+    #     prompt=dto.get_message(),
+    #     batch_size=dto.get_batch_size(),  # How many images to generate at once
+    #     num_steps=dto.get_num_steps(),  # Number of iterations (controls image quality)
+    #     seed=dto.get_seed(),  # Set this to always get the same image from the same prompt
+    # )
+    # image_name = 'images/' + dto.get_id() + '.png'
+    # Image.fromarray(img[0]).save(image_name)
+
+    time.sleep(15)
     image_name = 'images/' + dto.get_id() + '.png'
-    Image.fromarray(img[0]).save(image_name)
     set_image_path(dto.get_id(), image_name)
     print("saved at ", image_name)
 
@@ -101,7 +100,7 @@ def listen_to_queue():
 if __name__ == "__main__":
     # Создание нескольких процессов для обработки сообщений из очереди
     processes = []
-    for i in range(1):
+    for i in range(3):
         p = multiprocessing.Process(target=listen_to_queue)
         processes.append(p)
         p.start()
